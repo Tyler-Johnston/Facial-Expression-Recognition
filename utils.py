@@ -6,7 +6,7 @@ from skimage.feature import local_binary_pattern
 import seaborn as sns
 
 def extractLbpFeatures(faceImage):
-    ''' 
+    '''
         - inputs: faceImage: numpy array which represents a grayscale image of a face
         - outputs: hist: numpy array, histogram of LBP features.
         - description: computes LBP features of the input image and returns a normalized histogram of these features.
@@ -14,7 +14,10 @@ def extractLbpFeatures(faceImage):
     radius = 1
     nPoints = 8 * radius
     lbp = local_binary_pattern(faceImage, nPoints, radius, method="uniform")
-    nBins = int(lbp.max() + 1)
+    # uniform LBP always has nPoints+2 possible codes (nPoints+1 uniform patterns plus
+    # one bin for non-uniform patterns); this must be fixed rather than derived from the
+    # observed max, or histograms for different images can come out with different lengths
+    nBins = nPoints + 2
     hist, _ = np.histogram(lbp.ravel(), bins=nBins, range=(0, nBins), density=True)
     return hist
 
@@ -40,6 +43,15 @@ def extractOrbFeatures(faceImage, maxKeypoints=500, descriptorSize=32):
         # Return a zero vector if no keypoints are detected
         return np.zeros(maxKeypoints * descriptorSize)
 
+def selectLargestFace(faces):
+    '''
+        - inputs: faces: an array of (x, y, w, h) tuples returned by CascadeClassifier.detectMultiScale
+        - outputs: the (x, y, w, h) tuple with the largest area
+        - description: detectMultiScale can return multiple candidate faces with no guarantee the first
+          one is the most prominent, so this picks the largest by bounding-box area
+    '''
+    return max(faces, key=lambda face: face[2] * face[3])
+
 def processEmotionImages(baseFolder, emotions, underSample=True):
     '''
         - inputs: 1) baseFolder: a string path to the dataset
@@ -64,28 +76,26 @@ def processEmotionImages(baseFolder, emotions, underSample=True):
     # for each image in the CK+ dataset, obtain the LBP and ORB features along with the ground truth emotion
     for emotion in emotions:
         emotionFolder = os.path.join(baseFolder, emotion)
-        for filename in os.listdir(emotionFolder):
+        # sort filenames so which images get undersampled is deterministic across machines/runs
+        for filename in sorted(os.listdir(emotionFolder)):
             if filename.endswith('.jpg') or filename.endswith('.png'):
-                emotionImageCount[emotion] += 1
-                # stop reading future images for the current emotion if it hits the maxImage flag and undersampling is on
-                if underSample and emotionImageCount[emotion] > maxImages:
+                # stop reading further images for the current emotion once the maxImage cap is hit and undersampling is on
+                if underSample and emotionImageCount[emotion] >= maxImages:
                     break
+                emotionImageCount[emotion] += 1
                 imagePath = os.path.join(emotionFolder, filename)
                 image = cv2.imread(imagePath, cv2.IMREAD_GRAYSCALE)
+                if image is None:
+                    continue # skip files that aren't readable as images
                 # detect faces in the image
                 faces = faceCascade.detectMultiScale(image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
                 if len(faces) == 0:
                     continue # skip images where no face is detected
-                x, y, w, h = faces[0] # use the first detected face
+                x, y, w, h = selectLargestFace(faces)
                 faceImage = image[y:y+h, x:x+w] # extract the face region
-                # obtain the LBP and ORB feature sests from the given image
-                lbpFeatures = extractLbpFeatures(faceImage)
-                orbFeatures = extractOrbFeatures(faceImage)
-                # append the image future sets to the list of feature sets for all images
-                if lbpFeatures is not None:
-                    lbpFeaturesList.append(lbpFeatures)
-                if orbFeatures is not None:
-                    orbFeaturesList.append(orbFeatures)
+                # obtain the LBP and ORB feature sets from the given image
+                lbpFeaturesList.append(extractLbpFeatures(faceImage))
+                orbFeaturesList.append(extractOrbFeatures(faceImage))
                 # obtain the ground-truth emotion for that image
                 yLabels.append(emotion)
 
@@ -126,7 +136,7 @@ def featureFusion(lbpFeatures, orbFeatures, K, C, singleAxis=True):
 
     return fusedFeatures
 
-def displayResults(confusionMatrix, classAccuracies, accuracyScore, classificationReport, emotions, title, emotionImageCount):
+def displayResults(confusionMatrix, classAccuracies, accuracyScore, classificationReport, emotions, title, emotionImageCount, figuresFolder=None):
     '''
         - inputs: 1) confusionMatrix: an array representing the confusion matrix of the predictions
                   2) classAccuracies: an array representing the accuracies of each class.
@@ -135,6 +145,7 @@ def displayResults(confusionMatrix, classAccuracies, accuracyScore, classificati
                   5) emotions: an array of emotion labels used
                   6) title: a string title for the results display representing which feature set is being utilizied
                   7) emotionImageCount: a dictionary count of images trained for each emotion
+                  8) figuresFolder: optional string path; if given, the confusion matrix plot is also saved there as a .png
         - outputs: prints the accuracies and classification report, and plots the confusion matrix
         - description: this prints the classification report, class accuracies, and overall accuracy. It also visualizes the confusion matrix using a heatmap
     '''
@@ -144,6 +155,10 @@ def displayResults(confusionMatrix, classAccuracies, accuracyScore, classificati
     plt.title(title)
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
+
+    if figuresFolder:
+        os.makedirs(figuresFolder, exist_ok=True)
+        plt.savefig(os.path.join(figuresFolder, f'{title.lower()}_confusion_matrix.png'), bbox_inches='tight')
 
     # plot classification report, class accuracies, and the total accuracy
     print(f"\n{title} Classification Report:")
