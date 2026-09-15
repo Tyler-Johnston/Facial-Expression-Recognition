@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="820" viewBox="0 0 1600 820" role="img" aria-labelledby="title desc">
+  <title id="title">Facial Expression Recognition</title>
+  <desc id="desc">Editorial chart thumbnail showing test accuracy by feature set for an SVM facial-expression classifier across 8 emotions: LBP texture features at 15.3%, ORB keypoint features at 23.5%, and the combined LBP+ORB feature set at 27.1%.</desc>
+  <defs>
+    <pattern id="paperGrid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#16332A" stroke-opacity="0.09" stroke-width="1"/>
+    </pattern>
+    <filter id="softShadow" x="-20%" y="-30%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0C1F18" flood-opacity="0.20"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="820" fill="#E4EFEA"/>
+  <rect width="1600" height="820" fill="url(#paperGrid)"/>
+  <rect x="0" y="0" width="30" height="820" fill="#1B6E52"/>
+
+  <!-- Title block -->
+  <text x="94" y="140" fill="#16332A" font-family="Georgia, 'Times New Roman', serif" font-size="68" font-weight="700" letter-spacing="-2">Facial Expression</text>
+  <text x="94" y="209" fill="#16332A" font-family="Georgia, 'Times New Roman', serif" font-size="68" font-weight="700" letter-spacing="-2">Recognition</text>
+  <path d="M97 239H700" stroke="#1B6E52" stroke-width="5"/>
+  <text x="96" y="283" fill="#3F6B5A" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="0.7">TEST ACCURACY BY FEATURE SET (8 EMOTIONS)</text>
+
+  <!-- Bar-chart frame: 0-30% in 10% intervals -->
+  <text x="625" y="365" fill="#3F6B5A" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="0.7" text-anchor="end">ACCURACY</text>
+  <line x1="640" y1="390" x2="640" y2="665" stroke="#16332A" stroke-width="3"/>
+  <line x1="640" y1="390" x2="1490" y2="390" stroke="#16332A" stroke-opacity="0.20" stroke-width="2"/>
+  <line x1="640" y1="481.7" x2="1490" y2="481.7" stroke="#16332A" stroke-opacity="0.16" stroke-width="2"/>
+  <line x1="640" y1="573.3" x2="1490" y2="573.3" stroke="#16332A" stroke-opacity="0.16" stroke-width="2"/>
+  <line x1="640" y1="665" x2="1490" y2="665" stroke="#16332A" stroke-width="3"/>
+  <text x="612" y="397" fill="#3F6B5A" font-family="Arial, sans-serif" font-size="19" font-weight="700" text-anchor="end">30</text>
+  <text x="612" y="489" fill="#3F6B5A" font-family="Arial, sans-serif" font-size="19" font-weight="700" text-anchor="end">20</text>
+  <text x="612" y="580" fill="#3F6B5A" font-family="Arial, sans-serif" font-size="19" font-weight="700" text-anchor="end">10</text>
+  <text x="612" y="672" fill="#3F6B5A" font-family="Arial, sans-serif" font-size="19" font-weight="700" text-anchor="end">0</text>
+
+  <!-- Three feature-set bars; Combined (LBP+ORB) is the focal point -->
+  <g filter="url(#softShadow)">
+    <rect x="705" y="524.75" width="170" height="140.25" fill="#A8C2B6"/>
+    <rect x="975" y="449.6" width="170" height="215.4" fill="#4FA98A"/>
+    <rect x="1245" y="416.5" width="170" height="248.5" fill="#157A5B"/>
+  </g>
+  <text x="790" y="499" fill="#16332A" font-family="Arial, sans-serif" font-size="44" font-weight="800" text-anchor="middle">15.3%</text>
+  <text x="1060" y="425" fill="#16332A" font-family="Arial, sans-serif" font-size="48" font-weight="800" text-anchor="middle">23.5%</text>
+  <text x="1330" y="387" fill="#16332A" font-family="Arial, sans-serif" font-size="56" font-weight="800" text-anchor="middle">27.1%</text>
+
+  <!-- Feature-set labels share a baseline rather than separate cards -->
+  <text x="705" y="715" fill="#16332A" font-family="Arial, sans-serif" font-size="22" font-weight="700">LBP</text>
+  <text x="705" y="744" fill="#16332A" font-family="Arial, sans-serif" font-size="22" font-weight="700">(TEXTURE)</text>
+
+  <text x="975" y="715" fill="#16332A" font-family="Arial, sans-serif" font-size="22" font-weight="700">ORB</text>
+  <text x="975" y="744" fill="#16332A" font-family="Arial, sans-serif" font-size="22" font-weight="700">(KEYPOINTS)</text>
+
+  <text x="1245" y="715" fill="#16332A" font-family="Arial, sans-serif" font-size="22" font-weight="700">COMBINED</text>
+  <text x="1245" y="744" fill="#16332A" font-family="Arial, sans-serif" font-size="22" font-weight="700">(LBP + ORB)</text>
+
+</svg>
